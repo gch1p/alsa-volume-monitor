@@ -32,78 +32,78 @@ int notify(DBusConnection *conn)
 
 int open_ctl(const char *name, snd_ctl_t **ctlp)
 {
-	snd_ctl_t *ctl;
-	int err;
+    snd_ctl_t *ctl;
+    int err;
 
-	err = snd_ctl_open(&ctl, name, SND_CTL_READONLY);
-	if (err < 0) {
-		fprintf(stderr, "Cannot open ctl %s\n", name);
-		return err;
-	}
-	err = snd_ctl_subscribe_events(ctl, 1);
-	if (err < 0) {
-		fprintf(stderr, "Cannot open subscribe events to ctl %s\n", name);
-		snd_ctl_close(ctl);
-		return err;
-	}
-	*ctlp = ctl;
-	return 0;
+    err = snd_ctl_open(&ctl, name, SND_CTL_READONLY);
+    if (err < 0) {
+        fprintf(stderr, "Cannot open ctl %s\n", name);
+        return err;
+    }
+    err = snd_ctl_subscribe_events(ctl, 1);
+    if (err < 0) {
+        fprintf(stderr, "Cannot open subscribe events to ctl %s\n", name);
+        snd_ctl_close(ctl);
+        return err;
+    }
+    *ctlp = ctl;
+    return 0;
 }
 
 int check_event(snd_ctl_t *ctl, DBusConnection *conn)
 {
-	snd_ctl_event_t *event;
-	unsigned int mask;
-	int err;
+    snd_ctl_event_t *event;
+    unsigned int mask;
+    int err;
 
-	snd_ctl_event_alloca(&event);
-	err = snd_ctl_read(ctl, event);
-	if (err < 0)
-		return err;
+    snd_ctl_event_alloca(&event);
+    err = snd_ctl_read(ctl, event);
+    if (err < 0)
+        return err;
 
-	if (snd_ctl_event_get_type(event) != SND_CTL_EVENT_ELEM)
-		return 0;
-	
+    if (snd_ctl_event_get_type(event) != SND_CTL_EVENT_ELEM)
+        return 0;
+    
     mask = snd_ctl_event_elem_get_mask(event);
     if (!(mask & SND_CTL_EVENT_MASK_VALUE))
         return 0;
 
     notify(conn);
 
-	return 0;
+    return 0;
 }
 
-#define MAX_CARDS	256
+#define MAX_CARDS   256
 
 int monitor(const char *name, DBusConnection *conn) {
     snd_ctl_t *ctl;
-	int err = 0;
+    int err = 0;
 
     err = open_ctl(name, &ctl);
     if (err < 0)
         goto error;
 
     while (1) {
-		struct pollfd fd;
+        struct pollfd fd;
 
-		snd_ctl_poll_descriptors(ctl, &fd, 1);
+        snd_ctl_poll_descriptors(ctl, &fd, 1);
 
-		err = poll(&fd, 1, -1);
-		if (err <= 0) {
-			err = 0;
-			break;
-		}
+        err = poll(&fd, 1, -1);
+        if (err <= 0) {
+            err = 0;
+            break;
+        }
 
         unsigned short revents;
         snd_ctl_poll_descriptors_revents(ctl, &fd, 1,
                          &revents);
         if (revents & POLLIN)
             check_event(ctl, conn);
-	}
+    }
 
 error:
-	snd_ctl_close(ctl);
-	return err;
+    snd_ctl_close(ctl);
+    return err;
 }
 
 void usage()
