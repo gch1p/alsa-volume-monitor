@@ -123,7 +123,6 @@ int main(int argc, char *argv[])
 
     DBusConnection *connection;
     DBusError err;
-    int ret;
 
     dbus_error_init(&err);
     connection = dbus_bus_get(DBUS_BUS_SESSION, &err);
@@ -137,7 +136,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    ret = dbus_bus_request_name(connection, "com.ch1p.avm",
+    dbus_bus_request_name(connection, "com.ch1p.avm",
         DBUS_NAME_FLAG_REPLACE_EXISTING , &err);
     if (dbus_error_is_set(&err)) {
         fprintf(stderr, "DBus Name Error (%s)\n", err.message);
