@@ -1,6 +1,6 @@
 CC=gcc
-CFLAGS=-std=gnu99 -Wall -pedantic -Wextra `pkg-config --cflags ${LIBS}`
 LIBS=alsa dbus-1
+CFLAGS=-std=gnu99 -Wall -pedantic -Wextra `pkg-config --cflags ${LIBS}`
 LDFLAGS=`pkg-config --libs ${LIBS}`
 
 all: main
