@@ -18,5 +18,9 @@ dbus.connect_signal("com.ch1p.avm", function(...)
 )
 ```
 
+### Compiling on Ubuntu
+
+To build the app on Ubuntu, you need to install `libasound2-dev` and `libdbus-1-dev`.
+
 ### License
 GPLv2
