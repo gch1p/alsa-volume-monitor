@@ -6,7 +6,7 @@ LDFLAGS=`pkg-config --libs ${LIBS}`
 all: main
 
 main: main.o
-	${CC} ${LDFLAGS} main.o -o alsa-volume-monitor
+	${CC} main.o -o alsa-volume-monitor ${LDFLAGS}
 
 main.o:
 	${CC} ${CFLAGS} -c main.c
